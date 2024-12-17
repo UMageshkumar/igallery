@@ -26,64 +26,72 @@ Publish the website in the given URL.
 
 ## PROGRAM :
 ```
-gallery.html
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Celebrity Photo Gallery</title>
+    <title>Photo Gallery</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             margin: 0;
-            background-color: #111;
+            background: linear-gradient(135deg, #1f1f1f, #3d3d3d);
             color: #fff;
+            overflow-x: hidden;
         }
         h1 {
             text-align: center;
             margin: 20px 0;
-            font-size: 2.5rem;
+            font-size: 3rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: -webkit-linear-gradient(45deg, #0e98dd, #0ab4df);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         .gallery {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
             padding: 20px;
+            margin: 0 auto;
+            max-width: 1200px;
         }
         .gallery-item {
             position: relative;
             overflow: hidden;
-            border-radius: 10px;
-            cursor: pointer;
+            border-radius: 15px;
+            transition: transform 0.4s ease-in-out, box-shadow 0.4s;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
         }
         .gallery-item img {
-            width: 200px;
-            height: 400px;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s;
+            transition: transform 0.4s ease-in-out;
+        }
+        .gallery-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
         }
         .gallery-item:hover img {
-            transform: scale(1.1);
-            box-shadow: 0 8px 15px rgba(255, 255, 255, 0.2);
+            transform: scale(1.2);
         }
         .caption {
             position: absolute;
             bottom: 0;
-            background: rgba(255, 254, 254, 0.6);
+            background: rgba(0, 0, 0, 0.7);
             width: 100%;
             text-align: center;
-            padding: 10px;
-            font-size: 1.1rem;
-            transition: transform 0.3s;
+            padding: 12px 0;
+            font-size: 1.2rem;
+            text-transform: capitalize;
+            transition: all 0.4s ease-in-out;
         }
         .gallery-item:hover .caption {
-            transform: translateY(-10px);
+            background: rgba(255, 107, 107, 0.8);
         }
-        
-        /* Lightbox */
         #lightbox {
             display: none;
             position: fixed;
@@ -91,7 +99,7 @@ gallery.html
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             align-items: center;
             justify-content: center;
             z-index: 1000;
@@ -99,13 +107,9 @@ gallery.html
         #lightbox img {
             max-width: 90%;
             max-height: 90%;
-            border: 3px solid #fff;
-            border-radius: 10px;
+            border: 4px solid #f94c10;
+            border-radius: 12px;
         }
-        #lightbox:target {
-            display: flex;
-        }
-        
         #lightbox span {
             position: absolute;
             top: 20px;
@@ -113,39 +117,99 @@ gallery.html
             font-size: 2rem;
             color: #fff;
             cursor: pointer;
+            transition: color 0.3s;
+        }
+        #lightbox span:hover {
+            color: #f94c10;
+        }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <h1>Photo Gallery</h1>
-    <div class="gallery">
-        <a href="#lightbox1" class="gallery-item">
-            <img src="jr.jpg" alt="Jayam Ravi">
+    <h1>Celebrity Photo Gallery</h1>
+    <div class="gallery" id="gallery">
+        <!-- Celebrity Images -->
+        <div class="gallery-item">
+            <img src="jr.jpg" alt="Chris Hemsworth">
             <div class="caption">Jayam Ravi</div>
-        </a>
-        <a href="#lightbox2" class="gallery-item">
-            <img src="str.jpg" alt="Simbu">
+        </div>
+        <div class="gallery-item">
+            <img src="str.jpg" alt="Ryan Reynolds">
             <div class="caption">Simbu</div>
-        </a>
-        <a href="#lightbox3" class="gallery-item">
-            <img src="vijay.jpg" alt="Thalapathy Vijay">
+        </div>
+        <div class="gallery-item">
+            <img src="vijay.jpg" alt="Tom Holland">
             <div class="caption">Thalapathy Vijay</div>
-        </a>
-        <a href="#lightbox4" class="gallery-item">
-            <img src="sk.jpg" alt="Siva Karthikeyan">
-            <div class="caption">Siva Karthikeyan</div>
-        </a>
-        <a href="#lightbox5" class="gallery-item">
-            <img src="ajith.jpg" alt="Ajith Kumar">
-            <div class="caption">Ajith Kumar</div>
-        </a>
+        </div>
+        <div class="gallery-item">
+            <img src="sk.jpg" alt="Brad Pitt">
+            <div class="caption">Siva Karthikayen</div>
+        </div>
+        <div class="gallery-item">
+            <img src="ajith.jpg" alt="Robert Downey Jr.">
+            <div class="caption">Thala Ajith</div>
+        </div>
     </div>
+    <div id="lightbox">
+        <span id="closeLightbox">&times;</span>
+        <img src="" alt="Large Image" id="lightboxImg">
+    </div>
+
+    <script>
+        const galleryItems = document.querySelectorAll('.gallery-item img');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+        const closeLightbox = document.getElementById('closeLightbox');
+        let currentIndex = 0;
+
+        function openLightbox(index) {
+            currentIndex = index;
+            lightboxImg.src = galleryItems[index].src.replace('300x400', '600x800');
+            lightbox.style.display = 'flex';
+        }
+
+        function close() {
+            lightbox.style.display = 'none';
+        }
+
+        function showNext() {
+            currentIndex = (currentIndex + 1) % galleryItems.length;
+            openLightbox(currentIndex);
+        }
+
+        function showPrevious() {
+            currentIndex = (currentIndex - 1 + galleryItems.length) % galleryItems.length;
+            openLightbox(currentIndex);
+        }
+
+        galleryItems.forEach((img, index) => {
+            img.addEventListener('click', () => openLightbox(index));
+        });
+
+        closeLightbox.addEventListener('click', close);
+
+        document.addEventListener('keydown', (e) => {
+            if (lightbox.style.display === 'flex') {
+                if (e.key === 'Escape') close();
+                if (e.key === 'ArrowRight') showNext();
+                if (e.key === 'ArrowLeft') showPrevious();
+            }
+        });
+
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) close();
+        });
+    </script>
 </body>
 </html>
+
 
 ```
 
 ## OUTPUT:
-![alt text](<Screenshot (19).png>)
+![Screenshot (20)](https://github.com/user-attachments/assets/65ae8a6a-a421-4369-866c-0f7353a703ab)
+
 ## RESULT:
 The program for designing an interactive image gallery using HTML, CSS and JavaScript is executed successfully.
